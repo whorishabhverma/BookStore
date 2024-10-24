@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router();
 const {Book, User,Review} = require('../models/model')
 const jwt = require('jsonwebtoken');
-const {JWT_SECRET} = require("../config/db")
+const {JWT_SECRET} = require("../config/config")
 const userMiddleware  = require('../middlewares/user');
 
 //admin signup route

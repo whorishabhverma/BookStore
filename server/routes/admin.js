@@ -2,19 +2,18 @@ const express = require('express')
 const router = express.Router();
 const {Admin, Book,Review} = require('../models/model')
 const jwt = require('jsonwebtoken');
-const {JWT_SECRET} = require("../config/db")
+const {JWT_SECRET } = require("../config/config")
 const adminMiddleware  = require('../middlewares/admin');
 
 
 /*****************************************file uploads********************************************************/ 
 const cloudinary = require('cloudinary').v2;
-
-    cloudinary.config({ 
-        cloud_name: 'doaeimmxe', 
-        api_key: '462398385498682', 
-        api_secret: '55ZMJwH3yflRmiGGIGROgIBW0I4' 
-    });
-
+const config = require('../config/config');
+cloudinary.config({ 
+    cloud_name: config.cloudinary.cloudName, // Correctly access cloudName
+    api_key: config.cloudinary.apiKey,       // Correctly access apiKey
+    api_secret: config.cloudinary.apiSecret   // Correctly access apiSecret
+});
     const multer = require('multer');
     const { CloudinaryStorage } = require('multer-storage-cloudinary');
     
