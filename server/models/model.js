@@ -30,6 +30,7 @@ const ReviewSchema = new mongoose.Schema({
    comment: String
 });
 
+/*
 const BookSchema = new mongoose.Schema({
    title: String,
    description: String,
@@ -38,6 +39,23 @@ const BookSchema = new mongoose.Schema({
    publishedDate: Date,
    price: Number,
    category: String,
+   reviews: [{
+       type: mongoose.Schema.Types.ObjectId,
+       ref: 'Review'
+   }]
+});
+*/
+
+const BookSchema = new mongoose.Schema({
+   title: String,
+   description: String,
+   author: String,
+   publication: String,
+   publishedDate: Date,
+   price: Number,
+   category: String,
+   thumbnail: String,  // URL for the thumbnail image
+   pdf: String,        // URL for the PDF
    reviews: [{
        type: mongoose.Schema.Types.ObjectId,
        ref: 'Review'

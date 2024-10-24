@@ -5,6 +5,34 @@ const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = require("../config/db")
 const adminMiddleware  = require('../middlewares/admin');
 
+
+/*****************************************file uploads********************************************************/ 
+const cloudinary = require('cloudinary').v2;
+
+    cloudinary.config({ 
+        cloud_name: 'doaeimmxe', 
+        api_key: '462398385498682', 
+        api_secret: '55ZMJwH3yflRmiGGIGROgIBW0I4' 
+    });
+
+    const multer = require('multer');
+    const { CloudinaryStorage } = require('multer-storage-cloudinary');
+    
+    // Cloudinary storage configuration
+    const storage = new CloudinaryStorage({
+      cloudinary: cloudinary,
+      params: {
+        folder: 'bookstore',  // Folder name where images and PDFs will be stored
+        allowed_formats: ['jpg', 'png', 'pdf'],  // Allowed file formats
+        resource_type: 'auto'  // Auto-detect file type (useful for images and PDFs)
+      }
+    });
+    
+    // Initialize multer with Cloudinary storage
+    const upload = multer({ storage });    
+
+/********************************************************************************************** */
+
 //admin signup route
 router.post('/signup',async (req,res)=>{
     const {username,password} = req.body;
@@ -36,6 +64,8 @@ router.post('/signin',async (req,res)=>{
     }
 });
 
+
+/*
 router.post("/uploadBooks",adminMiddleware,async (req,res)=>{
     const {title,description,author,publication,publishedDate,price,category}= req.body;
     const newBook = await Book.create({
@@ -52,6 +82,42 @@ router.post("/uploadBooks",adminMiddleware,async (req,res)=>{
         BookId : newBook._id
     })
 })
+*/
+
+router.post("/uploadBooks", adminMiddleware, upload.fields([
+    { name: 'thumbnail', maxCount: 1 },  // Handle a single thumbnail image
+    { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
+]), async (req, res) => {
+    try {
+        const { title, description, author, publication, publishedDate, price, category } = req.body;
+
+        // Get the URLs of the uploaded files from Cloudinary
+        const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
+        const pdfUrl = req.files.pdf ? req.files.pdf[0].path : null;
+        console.log(req.files)
+        // Create a new book with the file URLs
+        const newBook = await Book.create({
+            title,
+            description,
+            author,
+            publication,
+            publishedDate,
+            price,
+            category,
+            thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
+            pdf: pdfUrl               // Save PDF URL in the database
+        });
+
+        res.json({
+            message: "Book added successfully",
+            BookId: newBook._id
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 
 router.get("/books",async(req,res)=>{
     const response = await Book.find({});
