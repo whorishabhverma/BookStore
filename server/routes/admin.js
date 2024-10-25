@@ -33,16 +33,43 @@ cloudinary.config({
 /********************************************************************************************** */
 
 //admin signup route
-router.post('/signup',async (req,res)=>{
-    const {username,password} = req.body;
-    await Admin.create({
-        username,
-        password
-    })   
-    res.json({
-        message :"Admin created successfully!"
-    }) 
+// router.post('/signup',async (req,res)=>{
+//     const {username,password} = req.body;
+//     await Admin.create({
+//         username,
+//         password
+//     })   
+//     res.json({
+//         message :"Admin created successfully!"
+//     }) 
+// });
+router.post('/signup', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Check if the username already exists
+        const existingAdmin = await Admin.findOne({ username });
+        if (existingAdmin) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+        // Create a new admin
+        await Admin.create({
+            username,
+            password
+        });
+
+        res.status(201).json({
+            message: "Admin created successfully!"
+        });
+    } catch (error) {
+        console.error(error); // Log the error for debugging
+        res.status(500).json({
+            message: 'Server error, please try again later.'
+        });
+    }
 });
+
 
 router.post('/signin',async (req,res)=>{
     const {username,password} = req.body;
@@ -161,7 +188,5 @@ router.get('/review/:bookName',adminMiddleware, async (req, res) => {
         });
     }
 });
-
-
 module.exports = router;
 

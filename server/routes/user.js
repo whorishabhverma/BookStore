@@ -4,38 +4,91 @@ const {Book, User,Review} = require('../models/model')
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = require("../config/config")
 const userMiddleware  = require('../middlewares/user');
+const adminMiddleware  = require('../middlewares/admin');
+const bcrypt = require('bcrypt');
 
 //admin signup route
-router.post('/signup',async (req,res)=>{
-    const {username,password} = req.body;
-    await User.create({
-        username,
-        password
-    })   
-    res.json({
-        message :"user created successfully!"
-    }) 
-});
+// router.post('/signup',async (req,res)=>{
+//     const {username,password} = req.body;
+//     await User.create({
+//         username,
+//         password
+//     })   
+//     res.json({
+//         message :"user created successfully!"
+//     }) 
+// });
 
-router.post('/signin',async (req,res)=>{
-    const {username,password} = req.body;
-    const user = await User.findOne({username,password});
-    
-    if(user){
-        const token = jwt.sign({
-            _id: user._id,
-            username: user.username
-        },JWT_SECRET)
 
-        res.json({
-            token
+router.post('/signup', async (req, res) => {
+    const { username, password, name, mobile } = req.body;
+    try {
+        // Check if the username already exists
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+        // Hash the password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the new user with hashed password
+        await User.create({
+            username,
+            password:hashedPassword,
+            name,
+            mobile
         });
-    }else{
-        res.status(401).json({
-            msg : "incorrect username or  password"
+
+        res.status(201).json({
+            message: "User created successfully!"
+        });
+    } catch (error) {
+        console.error(error); // Log the error for debugging
+        res.status(500).json({
+            message: 'Server error, please try again later.'
         });
     }
 });
+
+
+
+// Signin route
+router.post('/signin', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Find the user by username
+        const user = await User.findOne({ username });
+        
+        if (!user) {
+            return res.status(401).json({ msg: "Incorrect username or password" });
+        }
+
+        // Compare the provided password with the hashed password in the database
+        const isMatch = await bcrypt.compare(password, user.password);
+        
+        if (!isMatch) {
+            return res.status(401).json({ msg: "Incorrect username or password" });
+        }
+
+        // If password matches, generate a JWT token
+        const token = jwt.sign({
+            _id: user._id,
+            username: user.username
+        }, JWT_SECRET,
+    );
+
+        // Send the token to the client
+        res.json({
+            token
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Server error, please try again later." });
+    }
+});
+
 
 router.get("/book/:category",async (req,res)=>{
     const category = req.params.category;
