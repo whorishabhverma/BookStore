@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = require('../config/config')
 
 function adminMiddleware(req,res,next){
+    // const token = req.headers.authorization;
     const token = req.headers.authorization;
+    console.log(`token here`,req.headers.authorization)
     if(!token){
         return res.status(401).json({
             msg : "no token provided"

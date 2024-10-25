@@ -1,6 +1,8 @@
 // src/components/AdminDashboard.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import UploadBook from './UploadBook';
+import BooksList from './BookList';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -12,33 +14,24 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-500">
+    <div className="bg-white shadow-lg">
+    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
             <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                onClick={handleLogout}
+                className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out"
             >
-              Logout
+                Logout
             </button>
-          </div>
         </div>
-      </div>
-      <main>
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96">
-              <div className="p-4">
-                <h2 className="text-xl font-semibold">Welcome to Admin Dashboard</h2>
-                <p className="mt-2">Here you can manage your bookstore operations.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
     </div>
+</div>
+
+  <UploadBook/>
+</div>
+      
   );
 };
 

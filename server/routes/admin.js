@@ -77,7 +77,8 @@ router.post('/signin',async (req,res)=>{
     
     if(user){
         const token = jwt.sign({
-            username: user.username
+            username: user.username,
+            _id: user._id
         },JWT_SECRET)
 
         res.json({
@@ -110,6 +111,40 @@ router.post("/uploadBooks",adminMiddleware,async (req,res)=>{
 })
 */
 
+// router.post("/uploadBooks", adminMiddleware, upload.fields([
+//     { name: 'thumbnail', maxCount: 1 },  // Handle a single thumbnail image
+//     { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
+// ]), async (req, res) => {
+//     try {
+//         const { title, description, author, publication, publishedDate, price, category } = req.body;
+
+//         // Get the URLs of the uploaded files from Cloudinary
+//         const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
+//         const pdfUrl = req.files.pdf ? req.files.pdf[0].path : null;
+//         console.log(req.files)
+//         // Create a new book with the file URLs
+//         const newBook = await Book.create({
+//             title,
+//             description,
+//             author,
+//             publication,
+//             publishedDate,
+//             price,
+//             category,
+//             thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
+//             pdf: pdfUrl               // Save PDF URL in the database
+//         });
+
+//         res.json({
+//             message: "Book added successfully",
+//             BookId: newBook._id
+//         });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// });
+
+
 router.post("/uploadBooks", adminMiddleware, upload.fields([
     { name: 'thumbnail', maxCount: 1 },  // Handle a single thumbnail image
     { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
@@ -120,7 +155,10 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
         // Get the URLs of the uploaded files from Cloudinary
         const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
         const pdfUrl = req.files.pdf ? req.files.pdf[0].path : null;
-        console.log(req.files)
+
+        // Assume uploadedBy is stored in req.user from adminMiddleware
+        const uploadedBy = req.user._id; // Get the ID of the user who is uploading the book
+
         // Create a new book with the file URLs
         const newBook = await Book.create({
             title,
@@ -131,7 +169,8 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
             price,
             category,
             thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
-            pdf: pdfUrl               // Save PDF URL in the database
+            pdf: pdfUrl,              // Save PDF URL in the database
+            uploadedBy: uploadedBy     // Save the user ID who uploaded the book
         });
 
         res.json({
@@ -139,18 +178,23 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
             BookId: newBook._id
         });
     } catch (error) {
+        console.error(error);  // Log error for debugging
         res.status(500).json({ error: error.message });
     }
 });
 
 
 
-router.get("/books",async(req,res)=>{
-    const response = await Book.find({});
+router.get("/books",adminMiddleware,async(req,res)=>{
+    const uploadedById = req.user._id;
+    const response = await Book.find({
+        uploadedById
+    });
     res.json({
         Books : response
     })
 })
+
 
 router.get('/review/:bookName',adminMiddleware, async (req, res) => {
     try {

@@ -47,6 +47,22 @@ const BookSchema = new mongoose.Schema({
 });
 */
 
+// const BookSchema = new mongoose.Schema({
+//    title: String,
+//    description: String,
+//    author: String,
+//    publication: String,
+//    publishedDate: Date,
+//    price: Number,
+//    category: String,
+//    thumbnail: String,  // URL for the thumbnail image
+//    pdf: String,        // URL for the PDF
+//    reviews: [{
+//        type: mongoose.Schema.Types.ObjectId,
+//        ref: 'Review'
+//    }]
+// });
+
 const BookSchema = new mongoose.Schema({
    title: String,
    description: String,
@@ -60,7 +76,12 @@ const BookSchema = new mongoose.Schema({
    reviews: [{
        type: mongoose.Schema.Types.ObjectId,
        ref: 'Review'
-   }]
+   }],
+   uploadedBy: {        // New field for the user who uploaded the book
+       type: mongoose.Schema.Types.ObjectId,
+       ref: 'User',     // Reference to the User model
+       required: true   // Make it required if necessary
+   }
 });
 
 const Admin = mongoose.model('Admin', AdminSchema);
