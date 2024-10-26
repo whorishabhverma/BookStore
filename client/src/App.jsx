@@ -10,6 +10,8 @@ import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import BookList from './components/BookList'; // Import BooksList
+import ReadBook from './components/ReadBook';
+import myPdf from './components/Summary.pdf';
 
 const App = () => {
   return (
@@ -33,6 +35,7 @@ const App = () => {
                       </p>
                     </div>
                     <BookList /> {/* Add BooksList component here */}
+                    <ReadBook pdfUrl={myPdf} buttonText="View Document" />
                   </div>
                 </div>
               </>
@@ -40,6 +43,7 @@ const App = () => {
           />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
+          
 
           {/* Protected routes */}
           <Route 
