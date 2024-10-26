@@ -12,5 +12,4 @@ const HomePage = () => (
     <MyComponent />
   </Marquee>
 );
-
 export default HomePage;

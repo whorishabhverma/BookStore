@@ -100,12 +100,43 @@ router.get("/book/:category",async (req,res)=>{
     })
 })
 
-router.get("/books",async(req,res)=>{
-    const response = await Book.find({});
+// router.get("/books",async(req,res)=>{
+//     const response = await Book.find({});
+//     res.json({
+//         Books : response
+//     })
+// })
+
+// router.get("/books/:bookId",async(req,res)=>{
+//     const bookId = req.params.bookId;
+//     const response = await Book.find({
+//         _id : bookId
+//     });
+//     res.json({
+//         Books : response
+//     })
+// })
+
+
+router.get("/books/:bookId?", async (req, res) => {
+    const { bookId } = req.params;
+    const response = await Book.find(bookId ? { _id: bookId } : {});
     res.json({
-        Books : response
-    })
-})
+        Books: response
+    });
+});
+
+
+//will use this route for favourite books
+/*
+router.get("/favBooks", userMiddleware,async (req, res) => {
+    const { bookId } = req.params;
+    const response = await Book.find(bookId ? { _id: bookId } : {});
+    res.json({
+        Books: response
+    });
+});
+*/
 
 router.post('/review/:bookName',userMiddleware, async (req, res) => {
     try {

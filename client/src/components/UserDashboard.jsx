@@ -1,7 +1,7 @@
-// src/components/UserDashboard.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import BooksList from './BookList';
+import { useNavigate, Routes, Route } from 'react-router-dom';
+import BooksList from './Books/BooksList';
+import BookDetail from './Books/BookDetail';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -29,19 +29,34 @@ const UserDashboard = () => {
       </div>
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96">
-              <div className="p-4">
-                <h2 className="text-xl font-semibold">Welcome to Your Dashboard</h2>
-                <p className="mt-2">Browse and purchase your favorite books here.</p>
-              </div>
-            </div>
-          </div>
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <>
+                  <div className="px-4 py-6 sm:px-0">
+                    <div className="mb-8">
+                      <BooksList 
+                        apiUrl="http://localhost:5000/user/books"
+                        title="My Collection"
+                        requiresAuth={true}
+                      />
+                    </div>
+                    
+                  </div>
+                </>
+              } 
+            />
+            <Route 
+              path="/books/:id" 
+              element={<BookDetail requiresAuth={true} />} 
+            />
+          </Routes>
         </div>
       </main>
-      <BooksList/>
     </div>
   );
 };
+
 
 export default UserDashboard;

@@ -185,15 +185,14 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
 
 
 
-router.get("/books",adminMiddleware,async(req,res)=>{
-    const uploadedById = req.user._id;
-    const response = await Book.find({
-        uploadedById
-    });
-    res.json({
-        Books : response
-    })
-})
+router.get("/books", adminMiddleware, async (req, res) => {
+    try {
+        const response = await Book.find({ uploadedBy: req.user.id }); // Filter by logged-in user ID
+        res.json({ Books: response });
+    } catch (error) {
+        res.status(500).json({ msg: "Error fetching books" });
+    }
+});
 
 
 router.get('/review/:bookName',adminMiddleware, async (req, res) => {

@@ -12,6 +12,8 @@ const UploadBook = () => {
     const [price, setPrice] = useState('');
     const [category, setCategory] = useState('');
     const [thumbnail, setThumbnail] = useState(null);
+    const [pdf, setPdf] = useState(null);
+    const [pdfName, setPdfName] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,6 +27,9 @@ const UploadBook = () => {
         formData.append('category', category);
         if (thumbnail) {
             formData.append('thumbnail', thumbnail);
+        }
+        if (pdf) {
+            formData.append('pdf', pdf);
         }
 
         const token = localStorage.getItem('token');
@@ -45,9 +50,29 @@ const UploadBook = () => {
             setPrice('');
             setCategory('');
             setThumbnail(null);
+            setPdf(null);
+            setPdfName('');
         } catch (err) {
             console.error("Error response:", err.response);
             toast.error(err.response ? err.response.data.error : 'An error occurred.');
+        }
+    };
+
+    const handlePdfChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.type === 'application/pdf') {
+                if (file.size <= 50 * 1024 * 1024) { // 50MB limit
+                    setPdf(file);
+                    setPdfName(file.name);
+                } else {
+                    toast.error('PDF file size must be less than 50MB');
+                    e.target.value = '';
+                }
+            } else {
+                toast.error('Please upload a valid PDF file');
+                e.target.value = '';
+            }
         }
     };
 
@@ -61,6 +86,8 @@ const UploadBook = () => {
                 </div>
                 
                 <form onSubmit={handleSubmit} className="bg-white shadow-xl rounded-lg p-8 space-y-6">
+                    {/* Existing form fields remain the same until the thumbnail section */}
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="title">
@@ -186,6 +213,38 @@ const UploadBook = () => {
                                     <p className="pl-1">or drag and drop</p>
                                 </div>
                                 <p className="text-xs text-indigo-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* New PDF upload section */}
+                    <div>
+                        <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="pdf">
+                            PDF File
+                        </label>
+                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-indigo-200 border-dashed rounded-md hover:border-indigo-500 bg-indigo-50 transition duration-150 ease-in-out">
+                            <div className="space-y-1 text-center">
+                                <svg className="mx-auto h-12 w-12 text-indigo-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <div className="flex text-sm text-indigo-600">
+                                    <label htmlFor="pdf" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                        <span>Upload PDF</span>
+                                        <input
+                                            id="pdf"
+                                            type="file"
+                                            accept=".pdf"
+                                            onChange={handlePdfChange}
+                                            required
+                                            className="sr-only"
+                                        />
+                                    </label>
+                                    <p className="pl-1">or drag and drop</p>
+                                </div>
+                                <p className="text-xs text-indigo-500">PDF files up to 50MB</p>
+                                {pdfName && (
+                                    <p className="text-sm text-indigo-600 mt-2">Selected: {pdfName}</p>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -9,9 +8,9 @@ import SignIn from './components/SignIn';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import BookList from './components/BookList'; // Import BooksList
-import ReadBook from './components/ReadBook';
-import myPdf from './components/Summary.pdf';
+import BooksList from "./components/Books/BooksList";
+import BookDetail from "./components/Books/BookDetail";
+import { Footer } from './components/Footer';
 
 const App = () => {
   return (
@@ -34,8 +33,11 @@ const App = () => {
                         Your one-stop destination for all your favorite books
                       </p>
                     </div>
-                    <BookList /> {/* Add BooksList component here */}
-                    <ReadBook pdfUrl={myPdf} buttonText="View Document" />
+                    <BooksList 
+                      apiUrl="http://localhost:5000/user/books"
+                      title="Available Books"
+                      requiresAuth={false}
+                    />
                   </div>
                 </div>
               </>
@@ -44,10 +46,17 @@ const App = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
           
+          {/* Book detail routes */}
+          <Route path="/books/:id" element={
+            <>
+              <Navbar />
+              <BookDetail requiresAuth={true} />
+            </>
+          } />
 
           {/* Protected routes */}
           <Route 
-            path="/admin-dashboard" 
+            path="/admin-dashboard/*" 
             element={
               <ProtectedRoute>
                 <AdminDashboard />
@@ -55,7 +64,7 @@ const App = () => {
             } 
           />
           <Route 
-            path="/user-dashboard" 
+            path="/user-dashboard/*" 
             element={
               <ProtectedRoute>
                 <UserDashboard />
@@ -77,6 +86,7 @@ const App = () => {
           />
         </Routes>
       </div>
+      <Footer/>
     </Router>
   );
 };
