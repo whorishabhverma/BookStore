@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const BookCard = ({ book, className = '' }) => {
+const BookCard = ({ book, className = '', isHeartShow }) => {
+  const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
+
+  const handleHeartClick = (e) => {
+    e.stopPropagation(); // Prevent triggering the book card click event
+    setIsFavorite((prev) => !prev); // Toggle favorite state
+    alert(`Book ID ${book._id} is now your favorite!`); // Alert with book ID
+  };
 
   return (
     <div 
@@ -19,10 +26,21 @@ const BookCard = ({ book, className = '' }) => {
       </div>
       <h3 className="text-lg font-semibold text-gray-900 text-center">{book.title}</h3>
       <p className="text-sm text-gray-600 mt-1">{book.author}</p>
-      <p className="text-sm font-medium text-gray-800 mt-1">${book.price}</p>
+      <div className="flex items-center justify-between w-full mt-1">
+        <p className="text-sm font-medium text-gray-800">${book.price}</p>
+
+        {/* Conditionally render heart button */}
+        {isHeartShow && (
+          <button
+            onClick={handleHeartClick}
+            className={`ml-2 transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-500'} hover:text-red-600`}
+          >
+            ❤️ {/* Heart icon */}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
-
 
 export default BookCard;
