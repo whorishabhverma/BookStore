@@ -12,6 +12,7 @@ import BooksList from "./components/Books/BooksList";
 import BookDetail from "./components/Books/BookDetail";
 import { Footer } from './components/Footer';
 
+
 const App = () => {
   return (
     <Router>
@@ -38,6 +39,11 @@ const App = () => {
                       title="Available Books"
                       requiresAuth={false}
                     />
+
+
+ 
+
+
                   </div>
                 </div>
               </>

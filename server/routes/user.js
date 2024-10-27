@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Book, User,Review} = require('../models/model')
+const {Book, User,Review,Subscribe} = require('../models/model')
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = require("../config/config")
 const userMiddleware  = require('../middlewares/user');
@@ -137,6 +137,49 @@ router.get("/favBooks", userMiddleware,async (req, res) => {
     });
 });
 */
+
+router.post('/subscribe', async (req, res) => {
+    try {
+        const {email} = req.body;
+
+        // Check if already subscribed
+        const emailId = await Subscribe.findOne({ email });
+        if (emailId) {
+            return res.status(409).json({
+                success: false,
+                message: 'Already subscribed'
+            });
+        }
+
+        // Create new subscription
+        const subscribe = new Subscribe({
+            email,
+            subscribedAt: new Date(),
+            status: 'active'
+        });
+
+        await subscribe.save();
+
+        return res.status(201).json({
+            success: true,
+            message: 'Successfully subscribed to newsletter'
+        });
+
+    } catch (error) {
+        console.error('Subscription error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error subscribing',
+            error: error.message
+        });
+    }
+});
+
+
+
+
+
+
 
 router.post('/review/:bookName',userMiddleware, async (req, res) => {
     try {

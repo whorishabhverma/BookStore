@@ -84,14 +84,28 @@ const BookSchema = new mongoose.Schema({
    }
 });
 
+const SubscribeSchema = new mongoose.Schema(
+    {
+        email:String,
+        subscribedAt:  Date,
+        status: {
+        type: String,
+            enum: ['active', 'unsubscribed'],
+            default: 'active'
+        }
+    }
+)
+
 const Admin = mongoose.model('Admin', AdminSchema);
 const User = mongoose.model('User', UserSchema);
 const Book = mongoose.model('Book', BookSchema);
 const Review = mongoose.model('Review', ReviewSchema);
+const Subscribe = mongoose.model('Subscribe',SubscribeSchema);
 
 module.exports = {
    Admin,
    User,
    Book,
-   Review
+   Review,
+   Subscribe
 };

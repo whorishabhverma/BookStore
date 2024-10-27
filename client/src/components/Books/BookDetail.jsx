@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReadBook from '../ReadBook'; // Import ReadBook component
+import { toast, ToastContainer } from 'react-toastify'; // Import Toast and ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import styles
 
 const BookDetail = ({ requiresAuth = false }) => {
   const { id } = useParams();
@@ -10,13 +12,16 @@ const BookDetail = ({ requiresAuth = false }) => {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    setLoggedIn(!!token);
+
     const fetchBookDetails = async () => {
       try {
         const headers = {};
-        if (requiresAuth) {
-          const token = localStorage.getItem('token');
+        if (requiresAuth && token) {
           headers.Authorization = `Bearer ${token}`;
         }
 
@@ -88,11 +93,15 @@ const BookDetail = ({ requiresAuth = false }) => {
       </div>
 
       <div className="mt-8">
-        {book.pdf && (
-          <ReadBook 
-            pdfUrl={book.pdf} 
-            authorizationToken={requiresAuth ? localStorage.getItem('token') : null} 
-          />
+        {loggedIn ? (
+          book.pdf && (
+            <ReadBook 
+              pdfUrl={book.pdf} 
+              authorizationToken={requiresAuth ? localStorage.getItem('token') : null} 
+            />
+          )
+        ) : (
+          <p className="text-red-600">Please log in to read the book.</p>
         )}
       </div>
     </div>

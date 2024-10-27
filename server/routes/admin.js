@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router();
-const {Admin, Book,Review} = require('../models/model')
+const {Admin, Book,Review,Subscribe} = require('../models/model')
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET } = require("../config/config")
 const adminMiddleware  = require('../middlewares/admin');
-
+const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 /*****************************************file uploads********************************************************/ 
 const cloudinary = require('cloudinary').v2;
@@ -193,6 +194,91 @@ router.get("/books", adminMiddleware, async (req, res) => {
         res.status(500).json({ msg: "Error fetching books" });
     }
 });
+
+
+router.get("/allemails", async (req, res) => {
+    try {
+        const response = await Subscribe.find({ }); // Filter by logged-in user ID
+        res.json({ 
+            Emails: response.map(user=>user.email)
+         });
+    } catch (error) {
+        res.status(500).json({ msg: "Error fetching books" });
+    }
+});
+
+
+
+
+
+// Assuming you have an admin middleware already
+router.post('/send-newsletter', async (req, res) => {
+    try {
+        const { title, message } = req.body;
+
+        // Fetch all subscribed emails
+        const { data } = await axios.get('http://localhost:5000/admin/allemails');
+        const emails = data.Emails;
+
+        if (!emails || emails.length === 0) {
+            return res.status(400).json({ success: false, message: 'No subscribed emails found.' });
+        }
+
+        console.log("Emails to send:", emails); // Log for verification
+
+        // Configure nodemailer
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: config.EMAIL_USER,
+                pass: config.EMAIL_PASS
+            }
+        });
+
+        // Set up email options
+        const mailOptions = {
+            from: config.EMAIL_USER,
+            to: emails.join(','), // Convert array to comma-separated string
+            subject: title,
+            text: message,
+            html: `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="background-color: #4A90E2; padding: 20px; text-align: center;">
+        <img src="https://img.freepik.com/free-vector/book-shop-isometric-illustration_1284-19711.jpg?semt=ais_hybrid" alt="Logo" style="width: 100px; height: auto; margin-bottom: 10px;">
+        <h1 style="color: #fff; font-size: 24px; margin: 0;">Your Website Name</h1>
+      </div>
+      
+      <div style="padding: 20px;">
+        <h2 style="color: #4A90E2; font-size: 20px;">${title}</h2>
+        <p style="font-size: 16px; color: #555; line-height: 1.6;">${message}</p>
+        
+        <p style="margin-top: 20px; font-size: 14px; color: #777;">
+          For more updates, visit our website: 
+          <a href="https://BookishBazaar.com" style="color: #4A90E2; text-decoration: none;">yourwebsite.com</a>
+        </p>
+      </div>
+      
+      <div style="background-color: #f8f8f8; padding: 10px; text-align: center; font-size: 12px; color: #aaa;">
+        <p>&copy; ${new Date().getFullYear()} Your Website Name. All rights reserved.</p>
+      </div>
+    </div>
+  `
+        };
+
+        // Send email
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ success: true, message: 'Newsletter sent successfully!' });
+
+    } catch (error) {
+        console.error('Error sending newsletter:', error);
+        res.status(500).json({ success: false, message: 'Error sending newsletter', error: error.message });
+    }
+});
+
+
+
+
+
 
 
 router.get('/review/:bookName',adminMiddleware, async (req, res) => {

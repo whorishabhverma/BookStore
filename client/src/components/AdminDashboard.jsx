@@ -3,6 +3,7 @@ import { useNavigate, Routes, Route } from 'react-router-dom';
 import UploadBook from './UploadBook';
 import BooksList from './Books/BooksList';
 import BookDetail from './Books/BookDetail';
+import AdminNewsLetterForm from './AdminNewsLetterForm';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -48,7 +49,15 @@ const AdminDashboard = () => {
                     requiresAuth={true}
                   />
                 </div>
+
+                <div className="bg-white rounded-lg shadow p-6">
+                  <AdminNewsLetterForm />
+                </div>
+
+
               </div>
+
+              
             } 
           />
           <Route 
