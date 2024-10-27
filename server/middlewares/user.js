@@ -12,6 +12,7 @@ function userMiddleware(req,res,next){
     try{
         const decodedValue = jwt.verify(token,JWT_SECRET);
         req.user = decodedValue;
+        // console.log(req.user);
         next();
     }catch(error){
         return res.status(403).json({

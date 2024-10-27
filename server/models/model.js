@@ -81,7 +81,8 @@ const BookSchema = new mongoose.Schema({
        type: mongoose.Schema.Types.ObjectId,
        ref: 'User',     // Reference to the User model
        required: true   // Make it required if necessary
-   }
+   },
+   premium:Boolean
 });
 
 const SubscribeSchema = new mongoose.Schema(

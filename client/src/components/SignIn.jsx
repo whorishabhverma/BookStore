@@ -29,6 +29,8 @@ const SignIn = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userType', formData.userType);
+        localStorage.setItem('userId', data.userId);
+      
         navigate(`/${formData.userType}-dashboard`);
       } else {
         setMessage(data.message || 'Sign in failed');

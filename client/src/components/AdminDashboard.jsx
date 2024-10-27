@@ -47,6 +47,7 @@ const AdminDashboard = () => {
                     apiUrl="http://localhost:5000/admin/books"
                     title="Books Uploaded by you"
                     requiresAuth={true}
+                    isHeartShow={false}
                   />
                 </div>
 
@@ -64,7 +65,7 @@ const AdminDashboard = () => {
             path="/books/:id" 
             element={
               <div className="bg-white rounded-lg shadow p-6">
-                <BookDetail requiresAuth={true} />
+                <BookDetail requiresAuth={true}  />
               </div>
             } 
           />

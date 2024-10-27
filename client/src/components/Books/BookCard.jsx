@@ -1,26 +1,50 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const BookCard = ({ book, className = '', isHeartShow }) => {
+const BookCard = ({ book, className = '', isHeartShow, userId }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
 
-  const handleHeartClick = (e) => {
+  const handleHeartClick = async (e) => {
     e.stopPropagation(); // Prevent triggering the book card click event
     setIsFavorite((prev) => !prev); // Toggle favorite state
-    alert(`Book ID ${book._id} is now your favorite!`); // Alert with book ID
-  };
+
+    try {
+        const response = await fetch('http://localhost:5000/user/favorites', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId, // Pass the current user's ID
+                bookId: book._id, // Pass the current book's ID
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update favorites,Book is already your favourite');
+        }
+
+        const data = await response.json();
+        console.log('Favorite updated:', data);
+        alert(`Book ID ${book._id} is now your favorite!`);
+    } catch (error) {
+        console.error('Error updating favorites:', error);
+        alert('Failed to update favorites');
+    }
+};
+
 
   return (
-    <div 
+    <div
       onClick={() => navigate(`/books/${book._id}`)}
       className={`flex flex-col items-center p-4 border rounded-md shadow 
         hover:shadow-lg transition-shadow cursor-pointer ${className}`}
     >
       <div className="w-full h-48 mb-2">
-        <img 
-          src={book.thumbnail} 
-          alt={book.title} 
+        <img
+          src={book.thumbnail}
+          alt={book.title}
           className="w-full h-full object-contain rounded"
         />
       </div>

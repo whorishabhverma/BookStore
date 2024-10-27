@@ -11,7 +11,10 @@ const UserDashboard = () => {
     localStorage.removeItem('userType');
     navigate('/signin');
   };
+  const userId = localStorage.getItem('userId');
+  console.log("User ID:", userId);
 
+ 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-white shadow">
@@ -38,9 +41,23 @@ const UserDashboard = () => {
                     <div className="mb-8">
                       <BooksList 
                         apiUrl="http://localhost:5000/user/books"
-                        title="My Collection"
+                        title="Books available on Website"
                         requiresAuth={true}
+                        userId={userId}
+                        isHeartShow={true}
                       />
+
+                      <BooksList 
+                        apiUrl={`http://localhost:5000/user/books/fav/${userId}`}
+                        title="Your Favourite Books"
+                        requiresAuth={false}
+                        userId={userId}
+                      />
+
+
+
+                      
+                      
                     </div>
                     
                   </div>

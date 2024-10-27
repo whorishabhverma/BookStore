@@ -81,7 +81,8 @@ router.post('/signin', async (req, res) => {
 
         // Send the token to the client
         res.json({
-            token
+            token,
+            userId: user._id
         });
     } catch (error) {
         console.error(error);
@@ -125,6 +126,31 @@ router.get("/books/:bookId?", async (req, res) => {
         Books: response
     });
 });
+
+router.get('/books/fav/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Find the user by ID and populate the favouriteBooks field
+        const response = await User.findById(userId).populate('favouriteBooks');
+
+        // Check if response is null to handle not found
+        if (!response) { // Change this to check response instead of user
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Return the favorite books of the user
+        res.json({ 
+            Books: response.favouriteBooks // Return the populated favouriteBooks field
+        });
+    } catch (error) {
+        console.error('Error fetching favorite books:', error);
+        res.status(500).json({ message: 'Error fetching favorite books' });
+    }
+});
+
+
+
 
 
 //will use this route for favourite books
@@ -172,6 +198,30 @@ router.post('/subscribe', async (req, res) => {
             message: 'Error subscribing',
             error: error.message
         });
+    }
+});
+
+
+// Backend route to add book to user's favorites
+router.post('/favorites', async (req, res) => {
+    const { userId, bookId } = req.body;
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        if (user.favouriteBooks.includes(bookId)) {
+            return res.status(400).json({ msg: "Book is already in favorites" });
+        }
+
+        user.favouriteBooks.push(bookId);
+        await user.save();
+        res.json({ msg: "Book added to favorites", favoriteBooks: user.favouriteBooks });
+    } catch (error) {
+        console.error('Error updating favorites:', error);
+        res.status(500).json({ msg: 'Failed to update favorites', error });
     }
 });
 

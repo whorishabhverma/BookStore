@@ -5,10 +5,13 @@ const BooksList = ({
   apiUrl, 
   title = "Books List",
   requiresAuth = false,
+  userId, 
+  isHeartShow
 }) => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -44,7 +47,7 @@ const BooksList = ({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
       ) : (
-        <BookGrid books={books} error={error} requiresAuth={requiresAuth} />
+        <BookGrid books={books} error={error} requiresAuth={requiresAuth} userId={userId} isHeartShow={isHeartShow} />
       )}
     </div>
   );
