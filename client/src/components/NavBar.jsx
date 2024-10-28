@@ -16,6 +16,13 @@ const Navbar = () => {
     <nav className="bg-gradient-to-r from-blue-500 to-purple-500 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-white text-xl font-bold">BookishBazaar</Link>
+
+        <div className="flex space-x-8">
+          <Link to="/" className="text-white hover:text-gray-300">Home</Link>
+          <Link to="/about" className="text-white hover:text-gray-300">About</Link>
+          <Link to="/contact" className="text-white hover:text-gray-300">Contact Us</Link>
+        </div>
+
         <div className="space-x-4">
           {!token ? (
             <>
@@ -52,7 +59,6 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-    
   );
 };
 

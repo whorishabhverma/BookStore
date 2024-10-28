@@ -40,7 +40,7 @@ const BooksList = ({
   }, [apiUrl, requiresAuth]);
 
   return (
-    <div className="max-w-6xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
+    <div className="max-w-7xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
       {loading ? (
         <div className="flex justify-center items-center h-32">
