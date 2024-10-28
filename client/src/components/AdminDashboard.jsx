@@ -14,6 +14,9 @@ const AdminDashboard = () => {
     navigate('/signin');
   };
 
+  const userId = localStorage.getItem('userId');
+  console.log("User ID:", userId);
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-500">
       <div className="bg-white shadow-lg">
@@ -44,10 +47,11 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-lg shadow p-6">
                   <h2 className="text-2xl font-semibold mb-4">Manage Books</h2>
                   <BooksList 
-                    apiUrl="http://localhost:5000/admin/books"
+                    apiUrl={`http://localhost:5000/admin/books/${userId}`}
                     title="Books Uploaded by you"
                     requiresAuth={true}
                     isHeartShow={false}
+                    userId={userId}
                   />
                 </div>
 

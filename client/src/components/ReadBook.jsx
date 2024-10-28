@@ -44,7 +44,7 @@ const BookLoader = () => {
   );
 };
 
-const ReadBook = ({ pdfUrl, authorizationToken=false, buttonText = "Read Book" }) => {
+const ReadBook = ({ pdfUrl, authorizationToken, buttonText = "Read Book" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
@@ -108,11 +108,12 @@ const ReadBook = ({ pdfUrl, authorizationToken=false, buttonText = "Read Book" }
 
       const headers = {};
       if (authorizationToken) {
-        headers['Authorization'] = `Bearer ${authorizationToken}`;
+        headers['Authorization'] = `${authorizationToken}`;
       }
 
-      const response = await fetch(pdfUrl, { headers });
-      if (!response.ok) {
+      const response = await fetch(pdfUrl,{ mode: 'cors' });
+
+       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 

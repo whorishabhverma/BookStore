@@ -83,7 +83,8 @@ router.post('/signin',async (req,res)=>{
         },JWT_SECRET)
 
         res.json({
-            token
+            token,
+            userId: user._id
         });
     }else{
         res.status(401).json({
@@ -186,9 +187,10 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
 
 
 
-router.get("/books", adminMiddleware, async (req, res) => {
+router.get("/books/:userId", adminMiddleware, async (req, res) => {
+    const {userId} = req.params;
     try {
-        const response = await Book.find({ uploadedBy: req.user.id }); // Filter by logged-in user ID
+        const response = await Book.find({ uploadedBy: userId }); // Filter by logged-in user ID
         res.json({ Books: response });
     } catch (error) {
         res.status(500).json({ msg: "Error fetching books" });
@@ -241,28 +243,7 @@ router.post('/send-newsletter', async (req, res) => {
             to: emails.join(','), // Convert array to comma-separated string
             subject: title,
             text: message,
-            html: `
-    <div style="font-family: Arial, sans-serif; color: #333;">
-      <div style="background-color: #4A90E2; padding: 20px; text-align: center;">
-        <img src="https://img.freepik.com/free-vector/book-shop-isometric-illustration_1284-19711.jpg?semt=ais_hybrid" alt="Logo" style="width: 100px; height: auto; margin-bottom: 10px;">
-        <h1 style="color: #fff; font-size: 24px; margin: 0;">Your Website Name</h1>
-      </div>
-      
-      <div style="padding: 20px;">
-        <h2 style="color: #4A90E2; font-size: 20px;">${title}</h2>
-        <p style="font-size: 16px; color: #555; line-height: 1.6;">${message}</p>
-        
-        <p style="margin-top: 20px; font-size: 14px; color: #777;">
-          For more updates, visit our website: 
-          <a href="https://BookishBazaar.com" style="color: #4A90E2; text-decoration: none;">yourwebsite.com</a>
-        </p>
-      </div>
-      
-      <div style="background-color: #f8f8f8; padding: 10px; text-align: center; font-size: 12px; color: #aaa;">
-        <p>&copy; ${new Date().getFullYear()} Your Website Name. All rights reserved.</p>
-      </div>
-    </div>
-  `
+            
         };
 
         // Send email

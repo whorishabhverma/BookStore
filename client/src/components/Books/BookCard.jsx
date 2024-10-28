@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify'; // Import Toastify components
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS for Toastify
 
 const BookCard = ({ book, className = '', isHeartShow, userId }) => {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -22,18 +24,17 @@ const BookCard = ({ book, className = '', isHeartShow, userId }) => {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to update favorites,Book is already your favourite');
+            throw new Error('Failed to update favorites, Book is already your favourite');
         }
 
         const data = await response.json();
         console.log('Favorite updated:', data);
-        alert(`Book ID ${book._id} is now your favorite!`);
+        toast.success(`Book ID ${book._id} is now your favorite!`); // Show success toast
     } catch (error) {
         console.error('Error updating favorites:', error);
-        alert('Failed to update favorites');
+        toast.error('Failed to update favorites'); // Show error toast
     }
-};
-
+  };
 
   return (
     <div
@@ -63,6 +64,7 @@ const BookCard = ({ book, className = '', isHeartShow, userId }) => {
           </button>
         )}
       </div>
+      <ToastContainer /> {/* Add ToastContainer to render toasts */}
     </div>
   );
 };
