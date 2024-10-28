@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import BooksList from "./components/Books/BooksList";
 import BookDetail from "./components/Books/BookDetail";
 import { Footer } from './components/Footer';
+import PremiumPrompt from './components/Books/PremiumPrompt';
 
 
 const App = () => {
@@ -40,6 +41,7 @@ const App = () => {
                       requiresAuth={false}
                     />
 
+                    <PremiumPrompt/>
 
  
 

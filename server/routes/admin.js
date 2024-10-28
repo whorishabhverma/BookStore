@@ -152,7 +152,7 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
     { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
 ]), async (req, res) => {
     try {
-        const { title, description, author, publication, publishedDate, price, category } = req.body;
+        const { title, description, author, publication, publishedDate, price, category,premium } = req.body;
 
         // Get the URLs of the uploaded files from Cloudinary
         const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
@@ -172,7 +172,8 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
             category,
             thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
             pdf: pdfUrl,              // Save PDF URL in the database
-            uploadedBy: uploadedBy     // Save the user ID who uploaded the book
+            uploadedBy: uploadedBy, 
+            premium    // Save the user ID who uploaded the book
         });
 
         res.json({

@@ -52,7 +52,6 @@ const BookCard = ({ book, className = '', isHeartShow, userId }) => {
       <h3 className="text-lg font-semibold text-gray-900 text-center">{book.title}</h3>
       <p className="text-sm text-gray-600 mt-1">{book.author}</p>
       <div className="flex items-center justify-between w-full mt-1">
-        <p className="text-sm font-medium text-gray-800">${book.price}</p>
 
         {/* Conditionally render heart button */}
         {isHeartShow && (

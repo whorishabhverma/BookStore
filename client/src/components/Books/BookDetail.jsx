@@ -86,7 +86,6 @@ const BookDetail = ({ requiresAuth = false }) => {
             <p className="text-lg text-gray-800"><strong>Publication:</strong> {book.publication}</p>
             <p className="text-lg text-gray-800"><strong>Published Date:</strong> {new Date(book.publishedDate).toLocaleDateString()}</p>
             <p className="text-lg text-gray-800"><strong>Category:</strong> {book.category}</p>
-            <p className="text-lg text-gray-800"><strong>Price:</strong> ${book.price}</p>
           </div>
           <p className="mt-6 text-gray-700">{book.description}</p>
         </div>

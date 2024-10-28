@@ -14,6 +14,7 @@ const UploadBook = () => {
     const [thumbnail, setThumbnail] = useState(null);
     const [pdf, setPdf] = useState(null);
     const [pdfName, setPdfName] = useState('');
+    const [premium, setPremium] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,6 +26,7 @@ const UploadBook = () => {
         formData.append('publishedDate', publishedDate);
         formData.append('price', price);
         formData.append('category', category);
+        formData.append('premium', premium);
         if (thumbnail) {
             formData.append('thumbnail', thumbnail);
         }
@@ -52,6 +54,7 @@ const UploadBook = () => {
             setThumbnail(null);
             setPdf(null);
             setPdfName('');
+            setPremium(false);
         } catch (err) {
             console.error("Error response:", err.response);
             toast.error(err.response ? err.response.data.error : 'An error occurred.');
@@ -86,13 +89,9 @@ const UploadBook = () => {
                 </div>
                 
                 <form onSubmit={handleSubmit} className="bg-white shadow-xl rounded-lg p-8 space-y-6">
-                    {/* Existing form fields remain the same until the thumbnail section */}
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="title">
-                                Title
-                            </label>
+                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="title">Title</label>
                             <input
                                 type="text"
                                 id="title"
@@ -104,9 +103,7 @@ const UploadBook = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="author">
-                                Author
-                            </label>
+                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="author">Author</label>
                             <input
                                 type="text"
                                 id="author"
@@ -118,9 +115,7 @@ const UploadBook = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="description">
-                            Description
-                        </label>
+                        <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="description">Description</label>
                         <textarea
                             id="description"
                             value={description}
@@ -132,9 +127,7 @@ const UploadBook = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="publication">
-                                Publication
-                            </label>
+                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="publication">Publication</label>
                             <input
                                 type="text"
                                 id="publication"
@@ -145,9 +138,7 @@ const UploadBook = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="publishedDate">
-                                Published Date
-                            </label>
+                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="publishedDate">Published Date</label>
                             <input
                                 type="date"
                                 id="publishedDate"
@@ -160,9 +151,7 @@ const UploadBook = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="price">
-                                Price
-                            </label>
+                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="price">Price</label>
                             <div className="relative">
                                 <span className="absolute left-3 top-2 text-indigo-500">$</span>
                                 <input
@@ -176,9 +165,7 @@ const UploadBook = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="category">
-                                Category
-                            </label>
+                            <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="category">Category</label>
                             <input
                                 type="text"
                                 id="category"
@@ -190,69 +177,85 @@ const UploadBook = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="thumbnail">
-                            Thumbnail
-                        </label>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-indigo-200 border-dashed rounded-md hover:border-indigo-500 bg-indigo-50 transition duration-150 ease-in-out">
-                            <div className="space-y-1 text-center">
-                                <svg className="mx-auto h-12 w-12 text-indigo-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <div className="flex text-sm text-indigo-600">
-                                    <label htmlFor="thumbnail" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                        <span>Upload a file</span>
-                                        <input
-                                            id="thumbnail"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => setThumbnail(e.target.files[0])}
-                                            required
-                                            className="sr-only"
-                                        />
-                                    </label>
-                                    <p className="pl-1">or drag and drop</p>
-                                </div>
-                                <p className="text-xs text-indigo-500">PNG, JPG, GIF up to 10MB</p>
+                    <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="thumbnail">
+                        Thumbnail
+                    </label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-indigo-200 border-dashed rounded-md hover:border-indigo-500 bg-indigo-50 transition duration-150 ease-in-out">
+                        <div className="space-y-1 text-center">
+                            <svg className="mx-auto h-12 w-12 text-indigo-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <div className="flex text-sm text-indigo-600">
+                                <label htmlFor="thumbnail" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <span>Upload a file</span>
+                                    <input
+                                        id="thumbnail"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setThumbnail(e.target.files[0])}
+                                        required
+                                        className="sr-only"
+                                    />
+                                </label>
+                                <p className="pl-1">or drag and drop</p>
                             </div>
+                            <p className="text-xs text-indigo-500">PNG, JPG, GIF up to 10MB</p>
                         </div>
                     </div>
+                </div>
 
-                    {/* New PDF upload section */}
-                    <div>
-                        <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="pdf">
-                            PDF File
-                        </label>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-indigo-200 border-dashed rounded-md hover:border-indigo-500 bg-indigo-50 transition duration-150 ease-in-out">
-                            <div className="space-y-1 text-center">
-                                <svg className="mx-auto h-12 w-12 text-indigo-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <div className="flex text-sm text-indigo-600">
-                                    <label htmlFor="pdf" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                        <span>Upload PDF</span>
-                                        <input
-                                            id="pdf"
-                                            type="file"
-                                            accept=".pdf"
-                                            onChange={handlePdfChange}
-                                            required
-                                            className="sr-only"
-                                        />
-                                    </label>
-                                    <p className="pl-1">or drag and drop</p>
-                                </div>
-                                <p className="text-xs text-indigo-500">PDF files up to 50MB</p>
-                                {pdfName && (
-                                    <p className="text-sm text-indigo-600 mt-2">Selected: {pdfName}</p>
-                                )}
+                {/* New PDF upload section */}
+                <div>
+                    <label className="block text-sm font-medium text-indigo-700 mb-2" htmlFor="pdf">
+                        PDF File
+                    </label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-indigo-200 border-dashed rounded-md hover:border-indigo-500 bg-indigo-50 transition duration-150 ease-in-out">
+                        <div className="space-y-1 text-center">
+                            <svg className="mx-auto h-12 w-12 text-indigo-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <div className="flex text-sm text-indigo-600">
+                                <label htmlFor="pdf" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <span>Upload PDF</span>
+                                    <input
+                                        id="pdf"
+                                        type="file"
+                                        accept=".pdf"
+                                        onChange={handlePdfChange}
+                                        required
+                                        className="sr-only"
+                                    />
+                                </label>
+                                <p className="pl-1">or drag and drop</p>
                             </div>
+                            <p className="text-xs text-indigo-500">PDF files up to 50MB</p>
+                            {pdfName && (
+                                <p className="text-sm text-indigo-600 mt-2">Selected: {pdfName}</p>
+                            )}
                         </div>
+
+
+
+                    </div>
+                </div>
+
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            id="premium"
+                            checked={premium}
+                            onChange={(e) => setPremium(e.target.checked)}
+                            className="h-4 w-4 text-indigo-600 border-indigo-300 rounded focus:ring-indigo-500"
+                        />
+                        <label htmlFor="premium" className="block text-sm font-medium text-indigo-700">
+                            Premium Book
+                        </label>
                     </div>
 
-                    <div className="pt-4">
+                    <div className="text-right">
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                            className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700 transition duration-150 ease-in-out"
                         >
                             Upload Book
                         </button>
