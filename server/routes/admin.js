@@ -199,7 +199,7 @@ router.get("/books/:userId", adminMiddleware, async (req, res) => {
 });
 
 
-router.get("/allemails", async (req, res) => {
+router.get("/allemails",adminMiddleware, async (req, res) => {
     try {
         const response = await Subscribe.find({ }); // Filter by logged-in user ID
         res.json({ 

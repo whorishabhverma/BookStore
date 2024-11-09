@@ -7,18 +7,6 @@ const userMiddleware  = require('../middlewares/user');
 const adminMiddleware  = require('../middlewares/admin');
 const bcrypt = require('bcrypt');
 
-//admin signup route
-// router.post('/signup',async (req,res)=>{
-//     const {username,password} = req.body;
-//     await User.create({
-//         username,
-//         password
-//     })   
-//     res.json({
-//         message :"user created successfully!"
-//     }) 
-// });
-
 
 router.post('/signup', async (req, res) => {
     const { username, password, name, mobile } = req.body;
@@ -151,18 +139,18 @@ router.get('/books/fav/:userId', async (req, res) => {
 
 
 
-
-
-//will use this route for favourite books
-/*
-router.get("/favBooks", userMiddleware,async (req, res) => {
-    const { bookId } = req.params;
-    const response = await Book.find(bookId ? { _id: bookId } : {});
-    res.json({
-        Books: response
-    });
+//for search 
+router.get('/search', async (req, res) => {
+    const { query } = req.query; // Get the query from the request
+    try {
+        const books = await Book.find({ title: { $regex: query, $options: 'i' } }); // Search for books by title
+        res.json(books);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
-*/
+
+
 
 router.post('/subscribe', async (req, res) => {
     try {

@@ -11,11 +11,12 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
+    localStorage.removeItem('userId')
     navigate('/signin');
   };
 
   const userId = localStorage.getItem('userId');
-  console.log("User ID:", userId);
+  // console.log("User ID:", userId);
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-500">

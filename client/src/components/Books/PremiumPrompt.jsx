@@ -90,14 +90,21 @@ const PremiumPrompt = () => {
                             <div className="absolute -top-8 -right-8 w-64 h-64  rounded-full blur-3xl opacity-60" />
                             <div className="absolute -bottom-8 -left-8 w-64 h-64  rounded-full blur-3xl opacity-60" />
                             
-                            {/* Main image with container */}
-                            <div className="relative rounded-2xl p-6 backdrop-blur-sm">
+                            {/* Main image with container  */}
+                            <div className="relative rounded-2xl p-6 backdrop-blur-sm pb-1">
                                 <img 
                                     src={pngwing}
                                     alt="Premium Book Collection"
                                     className="relative w-96 h-96 object-contain transform hover:scale-105 transition duration-300 ease-in-out"
                                 />
                             </div>
+                           
+
+                           
+
+
+
+
                             
                             {/* Premium badge */}
                             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg">
