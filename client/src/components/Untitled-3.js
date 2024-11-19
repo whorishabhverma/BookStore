@@ -12,7 +12,6 @@ const UserSchema = new mongoose.Schema({
    password: String,
    name: String,
    mobile: Number,
-   premium: { type: Boolean, default: false },
    favouriteBooks: [{
        type: mongoose.Schema.Types.ObjectId,
        ref: 'Book'
@@ -32,37 +31,6 @@ const ReviewSchema = new mongoose.Schema({
    comment: String
 });
 
-/*
-const BookSchema = new mongoose.Schema({
-   title: String,
-   description: String,
-   author: String,
-   publication:String,
-   publishedDate: Date,
-   price: Number,
-   category: String,
-   reviews: [{
-       type: mongoose.Schema.Types.ObjectId,
-       ref: 'Review'
-   }]
-});
-*/
-
-// const BookSchema = new mongoose.Schema({
-//    title: String,
-//    description: String,
-//    author: String,
-//    publication: String,
-//    publishedDate: Date,
-//    price: Number,
-//    category: String,
-//    thumbnail: String,  // URL for the thumbnail image
-//    pdf: String,        // URL for the PDF
-//    reviews: [{
-//        type: mongoose.Schema.Types.ObjectId,
-//        ref: 'Review'
-//    }]
-// });
 
 const BookSchema = new mongoose.Schema({
    title: String,

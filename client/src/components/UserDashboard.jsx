@@ -1,21 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import BooksList from './Books/BooksList';
 import BookDetail from './Books/BookDetail';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  
+  const [favorites, setFavorites] = useState([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(true); // Loading state for favorites
+  const userId = localStorage.getItem('userId');
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
     localStorage.removeItem('userId');
     navigate('/signin');
   };
-  const userId = localStorage.getItem('userId');
-  // console.log("User ID:", userId);
 
- 
+  // Fetch favorites when the component mounts
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/user/books/fav/${userId}`, {
+          headers: { 'Authorization': `${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setFavorites(data.Books || []); // Ensure Books is correctly populated
+          setLoadingFavorites(false);  // Mark favorites as loaded
+        } else {
+          throw new Error('Failed to fetch favorite books');
+        }
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+        setLoadingFavorites(false);  // Stop loading even on error
+      }
+    };
+
+    fetchFavorites();
+  }, [userId]);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-white shadow">
@@ -34,47 +58,41 @@ const UserDashboard = () => {
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Routes>
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
                 <>
                   <div className="px-4 py-6 sm:px-0">
                     <div className="mb-8">
-                      <BooksList 
+                      {/* Displaying books excluding favorites */}
+                      <BooksList
                         apiUrl="http://localhost:5000/user/books"
                         title="Books available on Website"
                         requiresAuth={true}
+                        excludeFavorites={favorites} // Exclude favorite books here
+                        isHeartShow={true} // Show the heart icon for favorites
                         userId={userId}
-                        isHeartShow={true}
                       />
-
-                      <BooksList 
+                      
+                      {/* Displaying only favorite books */}
+                      <BooksList
                         apiUrl={`http://localhost:5000/user/books/fav/${userId}`}
                         title="Your Favourite Books"
-                        requiresAuth={false}
+                        requiresAuth={true}
+                        isHeartShow={false} // No heart icon here, since it's showing favorites
                         userId={userId}
                       />
-
-
-
-                      
-                      
                     </div>
-                    
                   </div>
                 </>
-              } 
+              }
             />
-            <Route 
-              path="/books/:id" 
-              element={<BookDetail requiresAuth={true} />} 
-            />
+            <Route path="/books/:id" element={<BookDetail requiresAuth={true} />} />
           </Routes>
         </div>
       </main>
     </div>
   );
 };
-
 
 export default UserDashboard;

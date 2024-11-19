@@ -11,11 +11,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import BooksList from "./components/Books/BooksList";
 import BookDetail from "./components/Books/BookDetail";
 import { Footer } from './components/Footer';
-import PremiumPrompt from './components/Books/PremiumPrompt';
 import AboutUs from './components/Books/AboutUs';
-import BookSearch from './pages/BookSearch';
-
-
+import Page from './components/Subscription/Page';
 
 const App = () => {
   return (
@@ -30,34 +27,20 @@ const App = () => {
                 <Navbar />
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                   <div className="px-4 py-6 sm:px-0">
-                     
-
                     <AboutUs/>
-
                     <BooksList 
                       apiUrl="http://localhost:5000/user/books"
                       title="Available Books"
                       requiresAuth={false}
                     />
-                  
-                    {/**<PremiumPrompt/>**/}
-
-
-                  
-
-
-
-      
-
-
- 
-
-
                   </div>
                 </div>
               </>
             } 
           />
+          
+          
+
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
           
@@ -100,8 +83,10 @@ const App = () => {
             } 
           />
         </Routes>
+        <Page/>
+        <Footer/>
+
       </div>
-      <Footer/>
     </Router>
   );
 };
