@@ -82,6 +82,14 @@ const UserDashboard = () => {
                         isHeartShow={false} // No heart icon here, since it's showing favorites
                         userId={userId}
                       />
+
+                      {/* Displaying only premium books */}
+                      <BooksList
+                        apiUrl={`http://localhost:5000/user/premium-books`}
+                        title="premium Books"
+                        requiresAuth={true}
+                      />
+
                     </div>
                   </div>
                 </>

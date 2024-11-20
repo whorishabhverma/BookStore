@@ -33,11 +33,13 @@ const App = () => {
                       title="Available Books"
                       requiresAuth={false}
                     />
+                    <Page/>
                   </div>
                 </div>
               </>
             } 
           />
+
           
           
 
@@ -83,7 +85,6 @@ const App = () => {
             } 
           />
         </Routes>
-        <Page/>
         <Footer/>
 
       </div>

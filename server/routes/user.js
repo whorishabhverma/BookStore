@@ -2,21 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { Book, User, Review, Subscribe } = require('../models/model');
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET, RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET } = require("../config/config");  // Import STRIPE_SECRET_KEY from config
+const { JWT_SECRET } = require("../config/config");  // Import STRIPE_SECRET_KEY from config
 const userMiddleware = require('../middlewares/user');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-/*
-const Razorpay = require('razorpay');
-require('dotenv').config();
-
-// Initialize Razorpay with your credentials
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,  // Razorpay Key ID from your environment variables
-    key_secret: process.env.RAZORPAY_KEY_SECRET,  // Razorpay Key Secret from your environment variables
-});
-
-*/
 
 
 router.post('/signup', async (req, res) => {
@@ -56,35 +45,44 @@ router.post('/signin', async (req, res) => {
     try {
         // Find the user by username
         const user = await User.findOne({ username });
-        
+
         if (!user) {
             return res.status(401).json({ msg: "Incorrect username or password" });
         }
 
         // Compare the provided password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
-        
+
         if (!isMatch) {
             return res.status(401).json({ msg: "Incorrect username or password" });
         }
 
         // If password matches, generate a JWT token
-        const token = jwt.sign({
-            _id: user._id,
-            username: user.username
-        }, JWT_SECRET,
-    );
+        const token = jwt.sign(
+            {
+                _id: user._id,
+                username: user.username,
+                premium: user.premium || false, // Include premium status
+            },
+            JWT_SECRET,
+            { expiresIn: '2h' } // Token expires in 2 hours
+        );
 
-        // Send the token to the client
-        res.json({
+        // Send the token and user information to the client
+        res.status(200).json({
             token,
-            userId: user._id
+            user: {
+                _id: user._id,
+                username: user.username,
+                premium: user.premium || false,
+            },
         });
     } catch (error) {
-        console.error(error);
+        console.error("Error during sign-in:", error);
         res.status(500).json({ msg: "Server error, please try again later." });
     }
 });
+
 router.get("/book/:category",async (req,res)=>{
     const category = req.params.category;
     const response = await Book.find({
@@ -94,22 +92,7 @@ router.get("/book/:category",async (req,res)=>{
         books:response
     })
 })
-// router.get("/books",async(req,res)=>{
-//     const response = await Book.find({});
-//     res.json({
-//         Books : response
-//     })
-// })
 
-// router.get("/books/:bookId",async(req,res)=>{
-//     const bookId = req.params.bookId;
-//     const response = await Book.find({
-//         _id : bookId
-//     });
-//     res.json({
-//         Books : response
-//     })
-// })
 router.get("/books/:bookId?", async (req, res) => {
     const { bookId } = req.params;
     const response = await Book.find(bookId ? { _id: bookId } : {});
@@ -122,22 +105,23 @@ router.get('/books/fav/:userId', async (req, res) => {
 
     try {
         // Find the user by ID and populate the favouriteBooks field
-        const response = await User.findById(userId).populate('favouriteBooks');
+        const user = await User.findById(userId).populate('favouriteBooks');
 
-        // Check if response is null to handle not found
-        if (!response) { // Change this to check response instead of user
+        // Check if user exists
+        if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Return the favorite books of the user
+        // Return the user's favorite books
         res.json({ 
-            Books: response.favouriteBooks // Return the populated favouriteBooks field
+            Books: user.favouriteBooks 
         });
     } catch (error) {
         console.error('Error fetching favorite books:', error);
         res.status(500).json({ message: 'Error fetching favorite books' });
     }
 });
+
 //for search 
 router.get('/search', async (req, res) => {
     const { query } = req.query; // Get the query from the request
@@ -213,11 +197,7 @@ router.post('/review/:bookName',userMiddleware, async (req, res) => {
         });
     }
  });
- router.post('/api/verify-username', async (req, res) => {
-    const { username } = req.body;
-    const user = await User.findOne({ username });
-    res.json({ exists: !!user });
-});
+
 
 router.get("/check/:username", async (req, res) => {
     const { username } = req.params;
@@ -237,8 +217,6 @@ router.get("/check/:username", async (req, res) => {
     }
   });
   
-
-
   router.post("/subscribe", async (req, res) => {
     const { username } = req.body;
 
@@ -283,86 +261,28 @@ router.get("/check/:username", async (req, res) => {
     }
 });
 
-
-
-router.post('/api/create-checkout-session', async (req, res) => {
-    const { username } = req.body;
-
-    try {
-        const user = await User.findOne({ username });
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        if (user.premium) return res.status(400).json({ error: 'User already premium' });
-
-        // Create Razorpay order
-        const orderOptions = {
-            amount: 1000 * 100, // Amount in paisa (1000 paisa = 10 INR)
-            currency: 'INR', // Currency in which the payment is made
-            receipt: `receipt_${new Date().getTime()}`,
-            payment_capture: 1, // Auto capture payment
-            notes: {
-                username, // Store username in notes for reference
-            },
-        };
-
-        const order = await razorpay.orders.create(orderOptions);
-
-        // Send the order details to the frontend for the payment
-        res.json({
-            id: order.id,
-            amount: order.amount,
-            currency: order.currency,
-            key_id: process.env.RAZORPAY_KEY_ID, // Razorpay Key ID
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred during order creation' });
+const checkPremiumUser = async (req, res, next) => {
+    const user = req.user; // `req.user` is set by your authentication middleware
+  
+    if (!user || !user.premium) {
+      return res.status(403).json({ message: "Access denied. Premium users only." });
     }
-});
-
-// Razorpay Webhook for payment verification
-router.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-    const payload = req.body;
-    const sig = req.headers['x-razorpay-signature'];
-
+    next();
+  };
+  router.get("/premium-books",userMiddleware,checkPremiumUser, async (req, res) => {
     try {
-        // Webhook secret key (from Razorpay Dashboard)
-        const crypto = require('crypto');
-        const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
-            .update(payload)
-            .digest('hex');
-
-        if (expectedSignature !== sig) {
-            return res.status(400).send('Invalid signature');
-        }
-
-        // Process the payment after verification
-        const paymentData = JSON.parse(payload);
-        if (paymentData.event === 'payment.captured') {
-            const orderId = paymentData.payload.payment.entity.order_id;
-            const paymentId = paymentData.payload.payment.entity.id;
-
-            // Fetch the order using Razorpay API and confirm the payment
-            const order = await razorpay.orders.fetch(orderId);
-
-            if (order.status === 'captured') {
-                const username = order.notes.username;
-
-                // Find the user and update their premium status
-                const user = await User.findOne({ username });
-                if (user) {
-                    user.premium = true; // Mark user as premium
-                    await user.save();
-                }
-            }
-        }
-
-        res.json({ received: true });
+      const books = await Book.find({ premium: true });
+      res.json({
+        Books: books,
+      });
     } catch (error) {
-        console.error('Webhook Error:', error);
-        res.status(400).send(`Webhook Error: ${error.message}`);
+      console.error("Error fetching premium books:", error);
+      res.status(500).json({ message: "Error fetching premium books" });
     }
-});
+  });
+
+
+
 
 module.exports = router;
 

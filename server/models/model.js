@@ -83,7 +83,7 @@ const BookSchema = new mongoose.Schema({
        ref: 'User',     // Reference to the User model
        required: true   // Make it required if necessary
    },
-   premium:Boolean
+   premium: { type: Boolean, default: false }
 });
 
 const SubscribeSchema = new mongoose.Schema(

@@ -1,23 +1,24 @@
-const jwt = require('jsonwebtoken')
-const { JWT_SECRET } = require('../config/config')
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/config');
 
-function userMiddleware(req,res,next){
+function userMiddleware(req, res, next) {
     const token = req.headers.authorization;
-    if(!token){
+
+    if (!token) {
         return res.status(401).json({
-            msg : "no token provided"
-        })
+            msg: "No token provided",
+        });
     }
 
-    try{
-        const decodedValue = jwt.verify(token,JWT_SECRET);
-        req.user = decodedValue;
-        // console.log(req.user);
+    try {
+        const decodedValue = jwt.verify(token, JWT_SECRET);
+        req.user = decodedValue; // Attach decoded token payload to `req.user`
         next();
-    }catch(error){
+    } catch (error) {
+        console.error("JWT verification failed:", error);
         return res.status(403).json({
-            msg : "Invalid or expired token"
-        })
+            msg: "Invalid or expired token",
+        });
     }
 }
 
