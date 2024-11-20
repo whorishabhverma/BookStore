@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = require('../config/config')
 
 function adminMiddleware(req,res,next){
-    // const token = req.headers.authorization;
     const token = req.headers.authorization;
     // console.log(`token here`,req.headers.authorization)
     if(!token){
@@ -23,3 +22,9 @@ function adminMiddleware(req,res,next){
 }
 
 module.exports = adminMiddleware;
+
+
+
+
+
+

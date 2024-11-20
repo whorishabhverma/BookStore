@@ -6,6 +6,8 @@ const {JWT_SECRET } = require("../config/config")
 const adminMiddleware  = require('../middlewares/admin');
 const nodemailer = require('nodemailer');
 const axios = require('axios');
+const bcrypt = require('bcrypt');
+
 
 /*****************************************file uploads********************************************************/ 
 const cloudinary = require('cloudinary').v2;
@@ -44,20 +46,70 @@ cloudinary.config({
 //         message :"Admin created successfully!"
 //     }) 
 // });
-router.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
+// router.post('/signup', async (req, res) => {
+//     const { username, password } = req.body;
 
+//     try {
+//         // Check if the username already exists
+//         const existingAdmin = await Admin.findOne({ username });
+//         if (existingAdmin) {
+//             return res.status(400).json({ message: 'Username already exists' });
+//         }
+
+//         // Create a new admin
+//         await Admin.create({
+//             username,
+//             password
+//         });
+
+//         res.status(201).json({
+//             message: "Admin created successfully!"
+//         });
+//     } catch (error) {
+//         console.error(error); // Log the error for debugging
+//         res.status(500).json({
+//             message: 'Server error, please try again later.'
+//         });
+//     }
+// });
+
+
+// router.post('/signin',async (req,res)=>{
+//     const {username,password} = req.body;
+//     const user = await Admin.findOne({username,password});
+    
+//     if(user){
+//         const token = jwt.sign({
+//             username: user.username,
+//             _id: user._id
+//         },JWT_SECRET)
+
+//         res.json({
+//             token,
+//             userId: user._id
+//         });
+//     }else{
+//         res.status(401).json({
+//             msg : "incorrect username or  password"
+//         });
+//     }
+// });
+router.post('/signup', async (req, res) => {
+    const { username, password} = req.body;
     try {
         // Check if the username already exists
-        const existingAdmin = await Admin.findOne({ username });
-        if (existingAdmin) {
+        const existingUser = await Admin.findOne({ username });
+        if (existingUser) {
             return res.status(400).json({ message: 'Username already exists' });
         }
 
-        // Create a new admin
+        // Hash the password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the new user with hashed password
         await Admin.create({
             username,
-            password
+            password:hashedPassword,
         });
 
         res.status(201).json({
@@ -71,25 +123,45 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+router.post('/signin', async (req, res) => {
+    const { username, password } = req.body;
 
-router.post('/signin',async (req,res)=>{
-    const {username,password} = req.body;
-    const user = await Admin.findOne({username,password});
-    
-    if(user){
-        const token = jwt.sign({
-            username: user.username,
-            _id: user._id
-        },JWT_SECRET)
+    try {
+        // Find the user by username
+        const user = await Admin.findOne({ username });
 
-        res.json({
+        if (!user) {
+            return res.status(401).json({ msg: "Incorrect username or password" });
+        }
+
+        // Compare the provided password with the hashed password in the database
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ msg: "Incorrect username or password" });
+        }
+
+        // If password matches, generate a JWT token
+        const token = jwt.sign(
+            {
+                _id: user._id,
+                username: user.username,
+            },
+            JWT_SECRET,
+            { expiresIn: '2h' } // Token expires in 2 hours
+        );
+
+        // Send the token and user information to the client
+        res.status(200).json({
             token,
-            userId: user._id
+            user: {
+                _id: user._id,
+                username: user.username,
+            },
         });
-    }else{
-        res.status(401).json({
-            msg : "incorrect username or  password"
-        });
+    } catch (error) {
+        console.error("Error during sign-in:", error);
+        res.status(500).json({ msg: "Server error, please try again later." });
     }
 });
 

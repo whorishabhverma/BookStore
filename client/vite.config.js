@@ -7,6 +7,9 @@ export default defineConfig({
   assetsInclude: ['**/*.pdf'],
   // If you need to serve PDFs from the public directory
   publicDir: 'public',
+  server: {
+    host: '0.0.0.0'
+  }
 })
 
 
