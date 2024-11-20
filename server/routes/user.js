@@ -95,11 +95,12 @@ router.get("/book/:category",async (req,res)=>{
 
 router.get("/books/:bookId?", async (req, res) => {
     const { bookId } = req.params;
-    const response = await Book.find(bookId ? { _id: bookId } : {});
+    const response = await Book.find(bookId ? { _id: bookId } : {premium:false});
     res.json({
         Books: response
     });
 });
+
 router.get('/books/fav/:userId', async (req, res) => {
     const { userId } = req.params;
 
@@ -121,6 +122,35 @@ router.get('/books/fav/:userId', async (req, res) => {
         res.status(500).json({ message: 'Error fetching favorite books' });
     }
 });
+
+
+router.get('/books/exclude/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Find the user and get their favorite books
+        const user = await User.findById(userId).populate('favouriteBooks', '_id');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Extract IDs of the user's favorite books
+        const favoriteBookIds = user.favouriteBooks.map(book => book._id);
+
+        // Fetch books that are not premium and not in the user's favorite books
+        const books = await Book.find({
+            premium: false,
+            _id: { $nin: favoriteBookIds }
+        });
+
+        // Respond with the filtered books
+        res.json({ Books: books });
+    } catch (error) {
+        console.error('Error fetching books:', error);
+        res.status(500).json({ message: 'Error fetching books' });
+    }
+});
+
 
 //for search 
 router.get('/search', async (req, res) => {

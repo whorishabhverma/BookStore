@@ -66,7 +66,7 @@ const UserDashboard = () => {
                     <div className="mb-8">
                       {/* Displaying books excluding favorites */}
                       <BooksList
-                        apiUrl="http://localhost:5000/user/books"
+                        apiUrl={`http://localhost:5000/user/books/exclude/${userId}`}
                         title="Books available on Website"
                         requiresAuth={true}
                         excludeFavorites={favorites} // Exclude favorite books here
