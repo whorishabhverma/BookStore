@@ -151,7 +151,20 @@ router.get('/books/exclude/:userId', async (req, res) => {
     }
 });
 
-
+router.get('/booksa', async (req, res) => {
+    const { query } = req.query;
+  
+    if (query) {
+      const books = await Book.find({
+        title: { $regex: query, $options: 'i' }, // Case-insensitive search
+      });
+      return res.json({ Books: books });
+    }
+  
+    const books = await Book.find();
+    res.json({ Books: books });
+  });
+  
 //for search 
 router.get('/search', async (req, res) => {
     const { query } = req.query; // Get the query from the request

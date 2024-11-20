@@ -24,14 +24,7 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery(''); // Clear the search input after navigation
-      closeMenu(); // Close mobile menu if open
-    }
-  };
+  
 
   return (
     <nav className="bg-gradient-to-r from-blue-500 to-purple-500">
@@ -62,22 +55,7 @@ const Navbar = () => {
             </div>
 
 
-            {/* Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center gap-2 ml-8">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for a book..."
-            className="px-8 py-2 bg-white rounded-lg border-none outline-none"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Search
-          </button>
-        </form>
+            
 
         
 
@@ -122,21 +100,7 @@ const Navbar = () => {
         <div
           className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} pt-2 pb-4 space-y-2`}
         >
-          <form onSubmit={handleSearchSubmit} className="px-4">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a book..."
-              className="w-full px-4 py-2 mb-2 rounded-lg border-none outline-none"
-            />
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-            >
-              Search
-            </button>
-          </form>
+          
           
           <Link to="/" className="block text-white hover:text-gray-300 py-2" onClick={closeMenu}>Home</Link>
           <Link to="/about" className="block text-white hover:text-gray-300 py-2" onClick={closeMenu}>About</Link>

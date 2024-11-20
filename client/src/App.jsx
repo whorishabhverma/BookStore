@@ -13,6 +13,7 @@ import BookDetail from "./components/Books/BookDetail";
 import { Footer } from './components/Footer';
 import AboutUs from './components/Books/AboutUs';
 import Page from './components/Subscription/Page';
+import SearchableBooks from './components/Books/SearchableBooks';
 
 const App = () => {
   return (
@@ -25,14 +26,10 @@ const App = () => {
             element={
               <>
                 <Navbar />
+                <SearchableBooks/>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                   <div className="px-4 py-6 sm:px-0">
                     <AboutUs/>
-                    <BooksList 
-                      apiUrl="http://localhost:5000/user/books"
-                      title="Available Books"
-                      requiresAuth={false}
-                    />
                     <Page/>
                   </div>
                 </div>
