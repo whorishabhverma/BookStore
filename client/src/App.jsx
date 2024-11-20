@@ -26,31 +26,48 @@ const App = () => {
             element={
               <>
                 <Navbar />
-                <SearchableBooks/>
+                {/* Use SearchableBooks with different API URL */}
+                <SearchableBooks 
+                  initialUrl="http://localhost:5000/user/booksa" 
+                  title="All Books" 
+                  requiresAuth={false} 
+                />
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                   <div className="px-4 py-6 sm:px-0">
-                    <AboutUs/>
-                    <Page/>
+                    <AboutUs />
+                    <Page />
                   </div>
                 </div>
               </>
             } 
           />
-
           
-          
+          {/* Another route with a different API URL */}
+          <Route 
+            path="/another" 
+            element={
+              <>
+                <Navbar />
+                <SearchableBooks 
+                  initialUrl="http://localhost:5000/user/anotherBooks"
+                  title="Another Books Collection"
+                  requiresAuth={false}
+                />
+              </>
+            }
+          />
 
+          {/* Other routes */}
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
           
-          {/* Book detail routes */}
           <Route path="/books/:id" element={
             <>
               <Navbar />
               <BookDetail requiresAuth={true} />
             </>
           } />
-
+          
           {/* Protected routes */}
           <Route 
             path="/admin-dashboard/*" 
@@ -82,8 +99,7 @@ const App = () => {
             } 
           />
         </Routes>
-        <Footer/>
-
+        <Footer />
       </div>
     </Router>
   );

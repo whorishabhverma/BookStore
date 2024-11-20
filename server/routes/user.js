@@ -152,18 +152,35 @@ router.get('/books/exclude/:userId', async (req, res) => {
 });
 
 router.get('/booksa', async (req, res) => {
-    const { query } = req.query;
+    const { query, category } = req.query;
   
+    // Build the filter object dynamically
+    const filter = {};
+  
+    // If a query is provided, add it to the filter (case-insensitive title search)
     if (query) {
-      const books = await Book.find({
-        title: { $regex: query, $options: 'i' }, // Case-insensitive search
-      });
-      return res.json({ Books: books });
+      filter.title = { $regex: query, $options: 'i' }; // Case-insensitive regex search for title
     }
   
-    const books = await Book.find();
-    res.json({ Books: books });
+    // If a category is provided, add it to the filter (case-insensitive category search)
+    if (category) {
+      filter.category = { $regex: category, $options: 'i' }; // Case-insensitive regex search for category
+    }
+  
+    try {
+      // Find books based on the filter (if empty, this will return all books)
+      const books = await Book.find(filter);
+  
+      // Return the filtered books (or all books if no filter is applied)
+      return res.json({ Books: books });
+    } catch (err) {
+      // Handle any errors that occur during the database query
+      return res.status(500).json({ error: err.message });
+    }
   });
+  
+  
+  
   
 //for search 
 router.get('/search', async (req, res) => {

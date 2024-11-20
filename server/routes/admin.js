@@ -185,38 +185,6 @@ router.post("/uploadBooks",adminMiddleware,async (req,res)=>{
 })
 */
 
-// router.post("/uploadBooks", adminMiddleware, upload.fields([
-//     { name: 'thumbnail', maxCount: 1 },  // Handle a single thumbnail image
-//     { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
-// ]), async (req, res) => {
-//     try {
-//         const { title, description, author, publication, publishedDate, price, category } = req.body;
-
-//         // Get the URLs of the uploaded files from Cloudinary
-//         const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
-//         const pdfUrl = req.files.pdf ? req.files.pdf[0].path : null;
-//         console.log(req.files)
-//         // Create a new book with the file URLs
-//         const newBook = await Book.create({
-//             title,
-//             description,
-//             author,
-//             publication,
-//             publishedDate,
-//             price,
-//             category,
-//             thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
-//             pdf: pdfUrl               // Save PDF URL in the database
-//         });
-
-//         res.json({
-//             message: "Book added successfully",
-//             BookId: newBook._id
-//         });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// });
 
 
 router.post("/uploadBooks", adminMiddleware, upload.fields([
@@ -330,6 +298,49 @@ router.post('/send-newsletter', async (req, res) => {
 });
 
 
+router.put('/books/:id', adminMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    try {
+        const updatedBook = await Book.findByIdAndUpdate(
+            id,
+            { ...updatedData },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedBook) {
+            return res.status(404).json({ msg: "Book not found" });
+        }
+
+        res.status(200).json({
+            msg: "Book updated successfully",
+            book: updatedBook,
+        });
+    } catch (error) {
+        console.error("Error updating book:", error);
+        res.status(500).json({ msg: "Error updating book" });
+    }
+});
+router.delete('/books/:id', adminMiddleware, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedBook = await Book.findByIdAndDelete(id);
+
+        if (!deletedBook) {
+            return res.status(404).json({ msg: "Book not found" });
+        }
+
+        res.status(200).json({
+            msg: "Book deleted successfully",
+            book: deletedBook,
+        });
+    } catch (error) {
+        console.error("Error deleting book:", error);
+        res.status(500).json({ msg: "Error deleting book" });
+    }
+});
 
 
 

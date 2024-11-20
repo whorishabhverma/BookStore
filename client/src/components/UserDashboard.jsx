@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import BooksList from './Books/BooksList';
 import BookDetail from './Books/BookDetail';
+import SearchableBooks from './Books/SearchableBooks';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -64,6 +65,17 @@ const UserDashboard = () => {
                 <>
                   <div className="px-4 py-6 sm:px-0">
                     <div className="mb-8">
+
+
+                      
+
+                      <SearchableBooks 
+                  initialUrl="http://localhost:5000/user/booksa" 
+                  title="All Books" 
+                  requiresAuth={false} 
+                />
+
+
                       {/* Displaying books excluding favorites */}
                       <BooksList
                         apiUrl={`http://localhost:5000/user/books/exclude/${userId}`}
