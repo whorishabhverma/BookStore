@@ -2,7 +2,12 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/config');
 
 function userMiddleware(req, res, next) {
-    const token = req.headers.authorization;
+    let token = req.headers.authorization;
+
+    // Check if the token is prefixed with 'Bearer ' and remove it
+    if (token && token.startsWith('Bearer ')) {
+        token = token.split(' ')[1];  // Remove 'Bearer ' prefix
+    }
 
     if (!token) {
         return res.status(401).json({

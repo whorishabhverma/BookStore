@@ -192,14 +192,19 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
     { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
 ]), async (req, res) => {
     try {
-        const { title, description, author, publication, publishedDate, price, category,premium } = req.body;
+        const { title, description, author, publication, publishedDate, price, category, premium } = req.body;
 
-        // Get the URLs of the uploaded files from Cloudinary
+        // Check if all required fields are provided
+        if (!title || !description || !author || !price || !category || !req.files.thumbnail || !req.files.pdf) {
+            return res.status(400).json({ error: "All fields are required including thumbnail and pdf." });
+        }
+
+        // Get the URLs of the uploaded files from Cloudinary (assuming you're using Cloudinary)
         const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
         const pdfUrl = req.files.pdf ? req.files.pdf[0].path : null;
 
         // Assume uploadedBy is stored in req.user from adminMiddleware
-        const uploadedBy = req.user._id; // Get the ID of the user who is uploading the book
+        const uploadedBy = req.user._id; // Ensure that req.user is set by your middleware
 
         // Create a new book with the file URLs
         const newBook = await Book.create({
@@ -212,8 +217,8 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
             category,
             thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
             pdf: pdfUrl,              // Save PDF URL in the database
-            uploadedBy: uploadedBy, 
-            premium    // Save the user ID who uploaded the book
+            uploadedBy,               // Save the ID of the user who uploaded the book
+            premium: premium || false // Ensure `premium` is a boolean (default false)
         });
 
         res.json({
@@ -225,6 +230,7 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 

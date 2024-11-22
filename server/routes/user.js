@@ -45,43 +45,35 @@ router.post('/signin', async (req, res) => {
     try {
         // Find the user by username
         const user = await User.findOne({ username });
-
         if (!user) {
             return res.status(401).json({ msg: "Incorrect username or password" });
         }
 
         // Compare the provided password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
-
         if (!isMatch) {
             return res.status(401).json({ msg: "Incorrect username or password" });
         }
 
-        // If password matches, generate a JWT token
+        // Generate JWT token
         const token = jwt.sign(
-            {
-                _id: user._id,
-                username: user.username,
-                premium: user.premium || false, // Include premium status
-            },
+            { _id: user._id, username: user.username, premium: user.premium || false },
             JWT_SECRET,
-            { expiresIn: '2h' } // Token expires in 2 hours
+            { expiresIn: '2h' }
         );
 
-        // Send the token and user information to the client
-        res.status(200).json({
-            token,
-            user: {
-                _id: user._id,
-                username: user.username,
-                premium: user.premium || false,
-            },
+        // Send response
+        return res.status(200).json({
+            token: `Bearer ${token}`,
+            user: { _id: user._id, username: user.username, premium: user.premium || false },
         });
     } catch (error) {
-        console.error("Error during sign-in:", error);
+        console.error("Server error during sign-in:", error); // Log detailed error
         res.status(500).json({ msg: "Server error, please try again later." });
     }
 });
+
+
 
 router.get("/book/:category",async (req,res)=>{
     const category = req.params.category;
@@ -215,48 +207,48 @@ router.post('/favorites', async (req, res) => {
         res.status(500).json({ msg: 'Failed to update favorites', error });
     }
 });
-router.post('/review/:bookName',userMiddleware, async (req, res) => {
-    try {
-        const bookName = req.params.bookName;
-        const userId = req.user._id;
-        console.log(userId)
-        const { rating, comment} = req.body;
+// router.post('/review/:bookName',userMiddleware, async (req, res) => {
+//     try {
+//         const bookName = req.params.bookName;
+//         const userId = req.user._id;
+//         console.log(userId)
+//         const { rating, comment} = req.body;
  
-        // Find the book by name
-        const book = await Book.findOne({ title: bookName });
-        if (!book) {
-            return res.status(404).json({
-                message: "Book not found"
-            });
-        }
+//         // Find the book by name
+//         const book = await Book.findOne({ title: bookName });
+//         if (!book) {
+//             return res.status(404).json({
+//                 message: "Book not found"
+//             });
+//         }
  
-        // Create new review
-        const review = new Review({
-            user: userId,
-            book: book._id,
-            rating: rating,
-            comment: comment
-        });
+//         // Create new review
+//         const review = new Review({
+//             user: userId,
+//             book: book._id,
+//             rating: rating,
+//             comment: comment
+//         });
  
-        // Save the review
-        await review.save();
+//         // Save the review
+//         await review.save();
  
-        // Add review to book's reviews array
-        book.reviews.push(review._id);
-        await book.save();
+//         // Add review to book's reviews array
+//         book.reviews.push(review._id);
+//         await book.save();
  
-        res.status(201).json({
-            message: "Review added successfully",
-            review: review
-        });
+//         res.status(201).json({
+//             message: "Review added successfully",
+//             review: review
+//         });
  
-    } catch (error) {
-        res.status(500).json({
-            message: "Error adding review",
-            error: error.message
-        });
-    }
- });
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Error adding review",
+//             error: error.message
+//         });
+//     }
+//  });
 
 
 router.get("/check/:username", async (req, res) => {
@@ -340,7 +332,93 @@ const checkPremiumUser = async (req, res, next) => {
       res.status(500).json({ message: "Error fetching premium books" });
     }
   });
+  // POST /user/books/:id/review
+  router.post('/books/:id/review', userMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { review, rating } = req.body;
+      const userId = req.user._id;  // Assuming middleware passes user ID
+  
+      if (!review || !rating) {
+        return res.status(400).json({ error: 'Review and rating are required.' });
+      }
+  
+      const book = await Book.findById(id);
+      if (!book) {
+        return res.status(404).json({ error: 'Book not found.' });
+      }
+  
+      const newReview = new Review({
+        user: userId,
+        book: id,
+        rating,
+        comment: review
+      });
+  
+      await newReview.save();
+      
+      // Add review reference to book's reviews array
+      book.reviews.push(newReview._id);
+      await book.save();
+  
+      res.status(201).json({ message: 'Review added successfully.', newReview });
+    } catch (error) {
+      console.error(error);  // Log the actual error for debugging
+      res.status(500).json({ error: 'Server error', details: error.message });
+    }
+  });
 
+  // GET /user/books/:id
+router.get('/Books/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const book = await Book.findById(id).populate('reviews');
+  
+      if (!book) {
+        return res.status(404).json({ error: 'Book not found.' });
+      }
+  
+      res.status(200).json({ Books: [book], Reviews: book.reviews });
+    } catch (error) {
+      res.status(500).json({ error: 'Server error.' });
+    }
+  });
+  
+
+  // Route to fetch reviews for a specific book
+router.get('/books/:id/reviews', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the book and populate its reviews with user details
+        const book = await Book.findById(id).populate({
+            path: 'reviews',
+            populate: {
+                path: 'user',
+                select: 'username' // Only select username for privacy
+            }
+        });
+
+        if (!book) {
+            return res.status(404).json({ error: 'Book not found' });
+        }
+
+        // Extract reviews with user information
+        const reviews = book.reviews.map(review => ({
+            _id: review._id,
+            comment: review.comment,
+            rating: review.rating,
+            user: review.user.username,
+            createdAt: review.createdAt
+        }));
+
+        res.json({ reviews });
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        res.status(500).json({ error: 'Server error', details: error.message });
+    }
+});
+  
 
 
 
