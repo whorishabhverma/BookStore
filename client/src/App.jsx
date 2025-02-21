@@ -8,24 +8,24 @@ import SignIn from './components/SignIn';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import BooksList from "./components/Books/BooksList";
 import BookDetail from "./components/Books/BookDetail";
 import { Footer } from './components/Footer';
 import AboutUs from './components/Books/AboutUs';
-import Page from './components/Subscription/Page';
 import SearchableBooks from './components/Books/SearchableBooks';
+import ContactUs from './components/ContactUs';
+import SubscriptionForm from './components/Subscription/SubscriptionFormProps';
 
 const App = () => {
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
+        <Navbar />
         <Routes>
           {/* Public routes */}
           <Route 
             path="/" 
             element={
               <>
-                <Navbar />
                 {/* Use SearchableBooks with different API URL */}
                 <SearchableBooks 
                   initialUrl="http://localhost:5000/user/booksa" 
@@ -34,20 +34,28 @@ const App = () => {
                 />
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                   <div className="px-4 py-6 sm:px-0">
-                    <AboutUs />
-                    <Page />
+                    <SubscriptionForm/>
                   </div>
                 </div>
               </>
             } 
           />
-          
+
+          {/* About Us page */}
+          <Route 
+            path="/about" 
+            element={
+              <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <AboutUs />
+              </div>
+            } 
+          />
+
           {/* Another route with a different API URL */}
           <Route 
             path="/another" 
             element={
               <>
-                <Navbar />
                 <SearchableBooks 
                   initialUrl="http://localhost:5000/user/anotherBooks"
                   title="Another Books Collection"
@@ -63,7 +71,6 @@ const App = () => {
           
           <Route path="/books/:id" element={
             <>
-              <Navbar />
               <BookDetail requiresAuth={true} />
             </>
           } />
@@ -98,7 +105,12 @@ const App = () => {
               </div>
             } 
           />
+
+          <Route path="/contact" element={<ContactUs/>} />
         </Routes>
+
+
+        
         <Footer />
       </div>
     </Router>
@@ -106,3 +118,8 @@ const App = () => {
 };
 
 export default App;
+
+
+
+
+

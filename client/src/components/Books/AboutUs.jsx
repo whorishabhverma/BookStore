@@ -14,7 +14,7 @@ const AboutUs = () => {
       description: "Regular meetings and author discussions"
     },
     {
-      icon: <Coffee className="w-6 h-6" />,
+      icon: <Coffee className="w-6 h-6 " />,
       title: "Reading Café",
       description: "Cozy space to enjoy books with coffee and snacks"
     }

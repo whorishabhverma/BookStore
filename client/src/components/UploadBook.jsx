@@ -43,6 +43,8 @@ const UploadBook = () => {
                     'Authorization': token,
                 },
             });
+
+            //It allows you to send both text and binary data in a single request. This is commonly used when uploading files through a form.
             toast.success(response.data.message);
             setTitle('');
             setDescription('');
@@ -267,3 +269,9 @@ const UploadBook = () => {
 };
 
 export default UploadBook;
+
+
+
+
+
+

@@ -188,25 +188,28 @@ router.post("/uploadBooks",adminMiddleware,async (req,res)=>{
 
 
 router.post("/uploadBooks", adminMiddleware, upload.fields([
-    { name: 'thumbnail', maxCount: 1 },  // Handle a single thumbnail image
-    { name: 'pdf', maxCount: 1 }         // Handle a single PDF file
+    { name: 'thumbnail', maxCount: 1 },
+    { name: 'pdf', maxCount: 1 }
 ]), async (req, res) => {
     try {
         const { title, description, author, publication, publishedDate, price, category, premium } = req.body;
 
-        // Check if all required fields are provided
-        if (!title || !description || !author || !price || !category || !req.files.thumbnail || !req.files.pdf) {
-            return res.status(400).json({ error: "All fields are required including thumbnail and pdf." });
+        // Validate required fields
+        if (!title || !description || !author || !price || !category || !req.files?.thumbnail || !req.files?.pdf) {
+            return res.status(400).json({ error: "All fields are required, including thumbnail and PDF." });
         }
 
-        // Get the URLs of the uploaded files from Cloudinary (assuming you're using Cloudinary)
-        const thumbnailUrl = req.files.thumbnail ? req.files.thumbnail[0].path : null;
-        const pdfUrl = req.files.pdf ? req.files.pdf[0].path : null;
+        // Extract file paths
+        const thumbnailUrl = req.files.thumbnail[0]?.path;
+        const pdfUrl = req.files.pdf[0]?.path;
 
-        // Assume uploadedBy is stored in req.user from adminMiddleware
-        const uploadedBy = req.user._id; // Ensure that req.user is set by your middleware
+        if (!thumbnailUrl || !pdfUrl) {
+            return res.status(400).json({ error: "File upload failed. Please try again." });
+        }
 
-        // Create a new book with the file URLs
+        const uploadedBy = req.user._id; // Set by adminMiddleware
+
+        // Create new book
         const newBook = await Book.create({
             title,
             description,
@@ -215,21 +218,22 @@ router.post("/uploadBooks", adminMiddleware, upload.fields([
             publishedDate,
             price,
             category,
-            thumbnail: thumbnailUrl,  // Save thumbnail URL in the database
-            pdf: pdfUrl,              // Save PDF URL in the database
-            uploadedBy,               // Save the ID of the user who uploaded the book
-            premium: premium || false // Ensure `premium` is a boolean (default false)
+            thumbnail: thumbnailUrl,
+            pdf: pdfUrl,
+            uploadedBy,
+            premium: premium || false,
         });
 
         res.json({
             message: "Book added successfully",
-            BookId: newBook._id
+            bookId: newBook._id
         });
     } catch (error) {
-        console.error(error);  // Log error for debugging
-        res.status(500).json({ error: error.message });
+        console.error("Error in /uploadBooks route:", error);
+        res.status(500).json({ error: "Internal Server Error: " + error.message });
     }
 });
+
 
 
 
@@ -330,7 +334,6 @@ router.put('/books/:id', adminMiddleware, async (req, res) => {
 });
 router.delete('/books/:id', adminMiddleware, async (req, res) => {
     const { id } = req.params;
-
     try {
         const deletedBook = await Book.findByIdAndDelete(id);
 

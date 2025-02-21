@@ -4,7 +4,6 @@ import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const userType = localStorage.getItem('userType');
@@ -24,8 +23,6 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  
-
   return (
     <nav className="bg-gradient-to-r from-blue-500 to-purple-500">
       <div className="container mx-auto px-4">
@@ -34,8 +31,6 @@ const Navbar = () => {
           <Link to="/" className="text-white text-xl font-bold" onClick={closeMenu}>
             BookishBazaar
           </Link>
-
-          
 
           {/* Mobile Menu Button */}
           <button
@@ -53,11 +48,6 @@ const Navbar = () => {
               <Link to="/about" className="text-white hover:text-gray-300">About</Link>
               <Link to="/contact" className="text-white hover:text-gray-300">Contact Us</Link>
             </div>
-
-
-            
-
-        
 
             <div className="space-x-4">
               {!token ? (
@@ -83,7 +73,6 @@ const Navbar = () => {
                   >
                     Dashboard
                   </Link>
-                  <span className="text-gray-300">|</span>
                   <button
                     onClick={handleLogout}
                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
@@ -96,12 +85,10 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu with Search */}
+        {/* Mobile Menu */}
         <div
           className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} pt-2 pb-4 space-y-2`}
         >
-          
-          
           <Link to="/" className="block text-white hover:text-gray-300 py-2" onClick={closeMenu}>Home</Link>
           <Link to="/about" className="block text-white hover:text-gray-300 py-2" onClick={closeMenu}>About</Link>
           <Link to="/contact" className="block text-white hover:text-gray-300 py-2" onClick={closeMenu}>Contact Us</Link>
